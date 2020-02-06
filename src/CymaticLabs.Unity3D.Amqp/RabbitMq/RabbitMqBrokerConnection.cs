@@ -495,10 +495,10 @@ namespace CymaticLabs.Unity3D.Amqp.RabbitMq
         }
 
         // Handles the unblocking of a connection
-        private void Connection_ConnectionUnblocked(IConnection sender)
+        private void Connection_ConnectionUnblocked(object sender, EventArgs args)
         {
             if (State == AmqpConnectionStates.Blocked) State = AmqpConnectionStates.Disconnected;
-            if (Disconnected != null) Disconnected(this, EventArgs.Empty);
+            if (Disconnected != null) Disconnected(this, args);
         }
 
         #endregion Event Handlers
@@ -715,7 +715,7 @@ namespace CymaticLabs.Unity3D.Amqp.RabbitMq
                 };
 
                 // Begin consuming messages
-                Channel.BasicConsume(subscription.QueueName, !subscription.UseAck, consumer);
+                subscription.ConsumerTag = Channel.BasicConsume(subscription.QueueName, !subscription.UseAck, consumer);
                 Console.WriteLine("Subscribed to {0} on {1}", subscription.QueueName, subscription.Connection);
                 //}
             }
@@ -888,7 +888,7 @@ namespace CymaticLabs.Unity3D.Amqp.RabbitMq
                 props.UserId = properties.UserId;
             }
 
-            Channel.BasicPublish(exchange, routingKey, mandatory, immediate, props, body);
+            Channel.BasicPublish(exchange, routingKey, mandatory, props, body);
         }
 
         #endregion Publishing
